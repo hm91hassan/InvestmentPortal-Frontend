@@ -21,7 +21,7 @@ const Login = () => {
   const twofactorauth = useNavigate();
   const alertmsgstyle = useRef();
   const homepage = useNavigate();
-  const [loginpage,setLoginPage] = useState(true);
+  const [loginpage, setLoginPage] = useState(true);
   const [userdata, setUserData] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
@@ -29,7 +29,7 @@ const Login = () => {
   const [alertmsg, setAlertmsg] = useState();
   const [errormsg, setErrorMsg] = useState();
 
-  
+
 
   const userAllData = () => {
     //Get Record - Detail View
@@ -37,12 +37,12 @@ const Login = () => {
       .get("/getrecord")
       .then(function (data) {
         console.log("Response Successfully.");
-        
+
         setUserData(data.data.data);
-  
-      }).catch(function(error){
+
+      }).catch(function (error) {
         console.log(error);
-        if(error.message === "Network Error"){
+        if (error.message === "Network Error") {
           setAlertmsg("Please check your internet connection.")
         }
       })
@@ -53,32 +53,32 @@ const Login = () => {
   const userLogin = () => {
     if (userdata) {
       if (!email || !password) {
-        
         setAlertmsg("Please fill the all fields");
-
-        
       }
       if (email && password) {
+
         for (let i = 0; i < userdata.length; i++) {
           const DecodePass = Base64.decode(userdata[i]?.Password);
-          
+
           if (userdata[i]?.Email === email && DecodePass === password) {
+
+            console.log("Email Pass");
             if (userdata[i].UserStatus === "Approved") {
-              
+
               console.log("Successfully login!");
-              
+
 
               twofactorauth("/emailotpverify", { state: userdata[i] });
             } else if (userdata[i].UserStatus === "Pending") {
-              
+
               setAlertmsg("Your request is pending...");
             } else {
-              
+
               setAlertmsg(
                 "Please ask an admin to grant permission to this app."
               );
             }
-          } else if (userdata[i]?.Email === email && DecodePass !== password) {
+          } else {
             setAlertmsg(
               "The username or password you have entered is incorrect, please try again or click on the Forgot Password link to reset your password"
             );
@@ -86,11 +86,15 @@ const Login = () => {
         }
       }
     } else {
-      
+
     }
   };
 
-  const ForgotPassword = async() => {
+  const removeError = () => {
+    setAlertmsg("");
+  }
+
+  const ForgotPassword = async () => {
     console.log(resetemail);
     if (userdata) {
       if (!resetemail) {
@@ -100,40 +104,40 @@ const Login = () => {
         setErrorMsg("Invalid Email !.");
       } else {
 
-        const data = await axios.post("/checkuseremail",{resetemail});
+        const data = await axios.post("/checkuseremail", { resetemail });
         console.log(data);
-        
 
-        if(data?.data === "Email found"){
+
+        if (data?.data === "Email found") {
 
           axios
-              .post(
-                "/sendForgotPasswordMail",
-                {
-                  resetemail,
-                }
-              )
-              .then(function (data) {
-                //console.log(data);
-                console.log(data.data.message);
-                if (data.data.message === "send email successfully") {
-                  
-                  setErrorMsg(
-                    "A link has been sent to the email address you entered above, please check your email and follow the link."
-                  );
-                } else {
-                  setErrorMsg("Something Wrong. Try again later!");
-                }
-              })
+            .post(
+              "/sendForgotPasswordMail",
+              {
+                resetemail,
+              }
+            )
+            .then(function (data) {
+              //console.log(data);
+              console.log(data.data.message);
+              if (data.data.message === "send email successfully") {
 
-        }else if(data?.data === "Email not found"){
+                setErrorMsg(
+                  "A link has been sent to the email address you entered above, please check your email and follow the link."
+                );
+              } else {
+                setErrorMsg("Something Wrong. Try again later!");
+              }
+            })
+
+        } else if (data?.data === "Email not found") {
           setErrorMsg("We can not find an account with this email address, please check your email is correct or you can register for an account.");
         }
 
         // for (let i = 0; i < userdata.length; i++) {
-        
+
         //   if (userdata[i]?.Email === resetemail) {
-            
+
         //     const id = userdata[i].ID;
         //     const email = userdata[i].Email;
         //     axios
@@ -148,7 +152,7 @@ const Login = () => {
         //         //console.log(data);
         //         console.log(data.data.message);
         //         if (data.data.message === "send email successfully") {
-                  
+
         //           setErrorMsg(
         //             "A link has been sent to the email address you entered above, please check your email and follow the link."
         //           );
@@ -156,14 +160,14 @@ const Login = () => {
         //           setErrorMsg("Something Wrong. Try again later!");
         //         }
         //       });
-            
+
         //   } else if (userdata[i]?.Email !== resetemail) {
         //     setErrorMsg("We can not find an account with this email address, please check your email is correct or you can register for an account.");
         //   }
         // }
       }
     } else {
-      
+
       setErrorMsg("The Username and Password does't match !");
     }
   };
@@ -194,18 +198,18 @@ const Login = () => {
                 backgroundColor: "#00ADEE",
               }}
             >
-              {loginpage === true &&(
+              {loginpage === true && (
                 <h3 className="text-white text-start mb-3">Please sign in</h3>
               )}
-              {loginpage === false &&(
+              {loginpage === false && (
                 <h3 className="text-white text-start mb-3">Forgot Password</h3>
               )}
-              
+
 
               <div className="row">
                 <div className="col-lg-6 col-md-6 col-sm-12 col-12 ">
-                  <p>{alertmsg}</p>
-                  {/* {alertmsg ? (
+
+                  {alertmsg ? (
                     <div
                       class="alert alert-warning alert-dismissible fade show"
                       role="alert"
@@ -216,14 +220,15 @@ const Login = () => {
                         class="btn-close"
                         data-bs-dismiss="alert"
                         aria-label="Close"
+                        onClick={removeError}
                       ></button>
                     </div>
                   ) : (
                     <> </>
-                  )} */}
+                  )}
 
-                  <p>{errormsg}</p>
-                  {/* {errormsg ? (
+
+                  {errormsg ? (
                     <div
                       class="alert alert-error alert-dismissible fade show"
                       role="alert"
@@ -234,136 +239,137 @@ const Login = () => {
                         class="btn-close"
                         data-bs-dismiss="alert"
                         aria-label="Close"
+
                       ></button>
                     </div>
                   ) : (
                     <> </>
-                  )} */}
+                  )}
 
                   {/* Sign in start */}
-                  {loginpage === true &&(
+                  {loginpage === true && (
                     <>
-                    <div class="form-group mt-2">
-                    <input
-                      style={{ backgroundColor: "#00ADEE", color: "white" }}
-                      type="text"
-                      class="form-control"
-                      id="username"
-                      aria-describedby="username"
-                      placeholder="User Email"
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div class="form-group mt-3">
-                    <input
-                      style={{ backgroundColor: "#00ADEE", color: "white" }}
-                      type="password"
-                      class="form-control"
-                      id="password"
-                      aria-describedby="password"
-                      placeholder="Password"
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                  <div class="form-group mt-3">
-                    <button
-                      //  style={{ float: "left", color: "#00ADEE" }}
-                      type="button"
-                      className="btn btn-primary mt-2 border-0"
-                      onClick={userLogin}
-                      id="registetionbutton"
-                    >
-                      Sign In
-                    </button>
+                      <div class="form-group mt-2">
+                        <input
+                          style={{ backgroundColor: "#00ADEE", color: "white" }}
+                          type="text"
+                          class="form-control"
+                          id="username"
+                          aria-describedby="username"
+                          placeholder="User Email"
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                      </div>
+                      <div class="form-group mt-3">
+                        <input
+                          style={{ backgroundColor: "#00ADEE", color: "white" }}
+                          type="password"
+                          class="form-control"
+                          id="password"
+                          aria-describedby="password"
+                          placeholder="Password"
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
+                      </div>
+                      <div class="form-group mt-3">
+                        <button
+                          //  style={{ float: "left", color: "#00ADEE" }}
+                          type="button"
+                          className="btn btn-primary mt-2 border-0"
+                          onClick={userLogin}
+                          id="registetionbutton"
+                        >
+                          Sign In
+                        </button>
 
-                    <p style={{ marginTop: 7 }} onClick={()=>setLoginPage(false)}>
-                    <a
-                      style={{ color: "white" }}
-                      data-bs-toggle="collapse"
-                      href="#collapseExample"
-                      role="button"
-                      aria-expanded="false"
-                      aria-controls="collapseExample"
-    
-                    >
-                      Forgot Password?
-                    </a>
-                  </p>
-                    
-                  </div>
+                        <p style={{ marginTop: 7 }} onClick={() => setLoginPage(false)}>
+                          <a
+                            style={{ color: "white" }}
+                            data-bs-toggle="collapse"
+                            href="#collapseExample"
+                            role="button"
+                            aria-expanded="false"
+                            aria-controls="collapseExample"
+
+                          >
+                            Forgot Password?
+                          </a>
+                        </p>
+
+                      </div>
                     </>
                   )}
-                  
+
                   {/* signin end */}
 
                   {/* test start  */}
                   {loginpage === false && (
                     <>
-                    
-                  <div
-                    style={{
-                      marginLeft: 0,
-                    }}
-                  >
-                    <div
-                      className="card card-body"
-                      style={{
-                        backgroundColor: "#00ADEE",
-                        border: 0,
-                        color: "white",
-                        marginTop: "-5px",
-                      }}
-                    >
-                      In order to reset your password, please enter your email
-                      address and we will send you a password reset link
-                      shortly.
-                      <div class="form-group mt-1">
-                        <input
+
+                      <div
+                        style={{
+                          marginLeft: 0,
+                        }}
+                      >
+                        <div
+                          className="card card-body"
                           style={{
                             backgroundColor: "#00ADEE",
+                            border: 0,
                             color: "white",
+                            marginTop: "-5px",
                           }}
-                          type="text"
-                          className="form-control"
-                          id=""
-                          aria-describedby="username"
-                          placeholder="User Email"
-                          required
-                          onChange={(e) =>
-                            setResetEmail(e.target.value.toLowerCase())
-                          }
-                        />
-                      </div>
-                      <div class="form-group mt-2">
-                      
-                        <button
-                          className={`${classes.ptimaryBtm}  btn btn-primary mt-2 border-0`}
-                          onClick={ForgotPassword}
                         >
-                          Submit
-                        </button>
-                                    
+                          In order to reset your password, please enter your email
+                          address and we will send you a password reset link
+                          shortly.
+                          <div class="form-group mt-1">
+                            <input
+                              style={{
+                                backgroundColor: "#00ADEE",
+                                color: "white",
+                              }}
+                              type="text"
+                              className="form-control"
+                              id=""
+                              aria-describedby="username"
+                              placeholder="User Email"
+                              required
+                              onChange={(e) =>
+                                setResetEmail(e.target.value.toLowerCase())
+                              }
+                            />
+                          </div>
+                          <div class="form-group mt-2">
+
+                            <button
+                              className={`${classes.ptimaryBtm}  btn btn-primary mt-2 border-0`}
+                              onClick={ForgotPassword}
+                            >
+                              Submit
+                            </button>
+
+                          </div>
+                          <p style={{ marginTop: 7 }} onClick={() => setLoginPage(true)}>
+                            <a
+                              style={{ color: "white" }}
+                              data-bs-toggle="collapse"
+                              href="#collapseExample"
+                              role="button"
+                              aria-expanded="false"
+                              aria-controls="collapseExample"
+
+                            >
+                              Sign In?
+                            </a>
+                          </p>
+                        </div>
                       </div>
-                      <p style={{ marginTop: 7 }} onClick={()=>setLoginPage(true)}>
-                    <a
-                      style={{ color: "white" }}
-                      data-bs-toggle="collapse"
-                      href="#collapseExample"
-                      role="button"
-                      aria-expanded="false"
-                      aria-controls="collapseExample"
-    
-                    >
-                      Sign In?
-                    </a>
-                  </p>
-                    </div>
-                  </div>
                     </>
                   )}
-                  
+
                   {/* Test end  */}
-                  
+
                   <div></div>
                 </div>
 
@@ -507,7 +513,7 @@ const Login = () => {
             {/* Latest News End  */}
           </div>
 
-          
+
         </div>
       </div>
 
