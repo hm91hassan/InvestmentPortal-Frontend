@@ -98,7 +98,7 @@ const Login = () => {
     console.log(resetemail);
     if (userdata) {
       if (!resetemail) {
-        //console.log("plz fill the all fields");
+
         setErrorMsg("Please enter your email !");
       } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(resetemail)) {
         setErrorMsg("Invalid Email !.");
